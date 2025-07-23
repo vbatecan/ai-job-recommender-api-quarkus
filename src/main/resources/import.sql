@@ -49,8 +49,7 @@ CREATE TABLE user_skills
     user_id          INT                            NOT NULL,
     name             VARCHAR(128) UNIQUE            NOT NULL,
     created_at       TIMESTAMP DEFAULT now(),
-    last_modified_at TIMESTAMP DEFAULT now(),
-    PRIMARY KEY (id, user_id)
+    last_modified_at TIMESTAMP DEFAULT now()
 );
 
 CREATE TABLE resumes
