@@ -16,6 +16,7 @@ public class JobTag extends PanacheEntityBase {
 	@Column(name = "id", nullable = false)
 
 	private Long id;
+	
 	@NotNull
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "job_id", nullable = false)

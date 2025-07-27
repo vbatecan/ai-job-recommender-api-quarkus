@@ -1,5 +1,6 @@
 package com.vbatecan.job_recommender.model.entity;
 
+import com.vbatecan.job_recommender.model.enumeration.ApplicationStatus;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -30,9 +31,9 @@ public class Application extends PanacheEntityBase {
 	@Column(name = "applied_at")
 	private Instant appliedAt;
 
-	@Lob
-	@Column(name = "status")
-	private String status;
+	@Column(name = "status", length = 255)
+	@Enumerated(EnumType.STRING)
+	private ApplicationStatus status;
 
 	public Job getJob() {
 		return job;
@@ -66,12 +67,21 @@ public class Application extends PanacheEntityBase {
 		this.appliedAt = appliedAt;
 	}
 
-	public String getStatus() {
+	public Long getId() {
+		return id;
+	}
+
+	public Application setId(Long id) {
+		this.id = id;
+		return this;
+	}
+
+	public ApplicationStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public Application setStatus(ApplicationStatus status) {
 		this.status = status;
+		return this;
 	}
-
 }

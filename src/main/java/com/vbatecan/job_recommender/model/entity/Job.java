@@ -1,5 +1,6 @@
 package com.vbatecan.job_recommender.model.entity;
 
+import com.vbatecan.job_recommender.model.enumeration.JobType;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -28,7 +29,6 @@ public class Job extends PanacheEntityBase {
 	@Column(name = "title", nullable = false)
 	private String title;
 
-	@Lob
 	@Column(name = "description")
 	private String description;
 
@@ -39,9 +39,9 @@ public class Job extends PanacheEntityBase {
 	private Integer salaryEnd;
 
 	@NotNull
-	@Lob
 	@Column(name = "job_type", nullable = false)
-	private String jobType;
+	@Enumerated(EnumType.STRING)
+	private JobType jobType;
 
 	@ColumnDefault("CURRENT_TIMESTAMP")
 	@Column(name = "posted_at")
@@ -49,6 +49,12 @@ public class Job extends PanacheEntityBase {
 
 	@Column(name = "expires_at")
 	private Instant expiresAt;
+
+	@OneToMany(mappedBy = "job")
+	private Set<Application> applications = new LinkedHashSet<>();
+
+	@OneToMany(mappedBy = "job")
+	private Set<JobTag> jobTags = new LinkedHashSet<>();
 
 	@ColumnDefault("CURRENT_TIMESTAMP")
 	@Column(name = "created_at")
@@ -58,11 +64,6 @@ public class Job extends PanacheEntityBase {
 	@Column(name = "last_modified_at")
 	private Instant lastModifiedAt;
 
-	@OneToMany(mappedBy = "job")
-	private Set<Application> applications = new LinkedHashSet<>();
-
-	@OneToMany(mappedBy = "job")
-	private Set<JobTag> jobTags = new LinkedHashSet<>();
 
 	public User getEmployer() {
 		return employer;
@@ -104,12 +105,22 @@ public class Job extends PanacheEntityBase {
 		this.salaryEnd = salaryEnd;
 	}
 
-	public String getJobType() {
+	public Long getId() {
+		return id;
+	}
+
+	public Job setId(Long id) {
+		this.id = id;
+		return this;
+	}
+
+	public JobType getJobType() {
 		return jobType;
 	}
 
-	public void setJobType(String jobType) {
+	public Job setJobType(JobType jobType) {
 		this.jobType = jobType;
+		return this;
 	}
 
 	public Instant getPostedAt() {

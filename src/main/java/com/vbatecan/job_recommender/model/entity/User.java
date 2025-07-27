@@ -1,12 +1,18 @@
 package com.vbatecan.job_recommender.model.entity;
 
+import com.vbatecan.job_recommender.model.enumeration.UserRole;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.security.jpa.Password;
+import io.quarkus.security.jpa.Roles;
+import io.quarkus.security.jpa.Username;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
+import java.util.Optional;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -16,10 +22,18 @@ public class User extends PanacheEntityBase {
 	@Column(name = "id", nullable = false)
 	private Long id;
 
-	@NotNull
-	@Lob
 	@Column(name = "role", nullable = false)
-	private String role;
+	@Enumerated(EnumType.STRING)
+	@Roles
+	private UserRole role;
+
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "user_id", nullable = false)
+	private Set<UserSkill> userSkills;
+
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "user_id", nullable = false)
+	private Set<Resume> resume;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "company_id")
@@ -50,11 +64,12 @@ public class User extends PanacheEntityBase {
 	@Size(max = 128)
 	@NotNull
 	@Column(name = "email", nullable = false, length = 128)
+	@Username
 	private String email;
 
 	@Size(max = 60)
-	@NotNull
 	@Column(name = "password", nullable = false, length = 60)
+	@Password
 	private String password;
 
 	@NotNull
@@ -66,19 +81,75 @@ public class User extends PanacheEntityBase {
 	private Instant lastLogin;
 
 	@ColumnDefault("CURRENT_TIMESTAMP")
-	@Column(name = "created_at")
+	@Column(name = "created_at", updatable = false)
 	private Instant createdAt;
 
 	@ColumnDefault("CURRENT_TIMESTAMP")
 	@Column(name = "last_modified_at")
 	private Instant lastModifiedAt;
 
-	public String getRole() {
+	public static Optional<User> get(Long id) {
+		return User.findByIdOptional(id);
+	}
+
+	public static Optional<User> getByEmail(String email) {
+		return User.find("email", email).firstResultOptional();
+	}
+
+	public Set<Resume> getResume() {
+		return resume;
+	}
+
+	public User setResume(Set<Resume> resume) {
+		this.resume = resume;
+		return this;
+	}
+
+	@PrePersist
+	void onCreate() {
+		createdAt = Instant.now();
+		lastModifiedAt = Instant.now();
+	}
+
+	@PreUpdate
+	void onUpdate() {
+		lastModifiedAt = Instant.now();
+	}
+
+	public @NotNull Set<UserSkill> getUserSkills() {
+		return userSkills;
+	}
+
+	public User setUserSkills(@NotNull Set<UserSkill> userSkills) {
+		this.userSkills = userSkills;
+		return this;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public User setId(Long id) {
+		this.id = id;
+		return this;
+	}
+
+	public UserRole getRole() {
 		return role;
 	}
 
-	public void setRole(String role) {
+	public User setRole(UserRole role) {
 		this.role = role;
+		return this;
+	}
+
+	public Boolean getActive() {
+		return isActive;
+	}
+
+	public User setActive(Boolean active) {
+		isActive = active;
+		return this;
 	}
 
 	public Company getCompany() {

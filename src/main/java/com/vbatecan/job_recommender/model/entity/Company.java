@@ -1,8 +1,8 @@
 package com.vbatecan.job_recommender.model.entity;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.ColumnDefault;
@@ -20,6 +20,7 @@ public class Company extends PanacheEntityBase {
 	@Size(max = 128)
 	@NotNull
 	@Column(name = "name", nullable = false, length = 128)
+	@NotBlank
 	private String name;
 
 	@Size(max = 255)

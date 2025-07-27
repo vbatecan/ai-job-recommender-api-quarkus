@@ -16,11 +16,6 @@ public class UserSkill extends PanacheEntityBase {
 	@Column(name = "id", nullable = false)
 	private Long id;
 
-	@NotNull
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
-
 	@Size(max = 128)
 	@NotNull
 	@Column(name = "name", nullable = false, length = 128)
@@ -34,12 +29,13 @@ public class UserSkill extends PanacheEntityBase {
 	@Column(name = "last_modified_at")
 	private Instant lastModifiedAt;
 
-	public User getUser() {
-		return user;
+	public Long getId() {
+		return id;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public UserSkill setId(Long id) {
+		this.id = id;
+		return this;
 	}
 
 	public String getName() {

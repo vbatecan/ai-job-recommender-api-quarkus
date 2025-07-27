@@ -15,10 +15,6 @@ public class Resume extends PanacheEntityBase {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", nullable = false)
 	private Long id;
-	@NotNull
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
 
 	@Size(max = 128)
 	@NotNull
@@ -40,14 +36,6 @@ public class Resume extends PanacheEntityBase {
 	@ColumnDefault("CURRENT_TIMESTAMP")
 	@Column(name = "last_modified_at")
 	private Instant lastModifiedAt;
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
 
 	public String getName() {
 		return name;
