@@ -1,26 +1,35 @@
 package com.vbatecan.job_recommender.service;
 
+import com.vbatecan.job_recommender.exception.ExpiredTokenException;
+import com.vbatecan.job_recommender.exception.InvalidTokenException;
 import com.vbatecan.job_recommender.model.entity.User;
 import com.vbatecan.job_recommender.model.input.AuthenticationRequest;
 import com.vbatecan.job_recommender.model.input.RegistrationRequest;
+import com.vbatecan.job_recommender.model.output.LoginInformation;
+import io.quarkus.security.identity.SecurityIdentity;
+import org.eclipse.microprofile.jwt.JsonWebToken;
+
+import java.util.Optional;
 
 public interface AuthenticationService {
 
 	/**
-	 * Authenticate a user with their email and password.
+	 * Attempts to log in with the given request.
 	 *
-	 * @param request user email and password
-	 * @return the corresponding user if authenticated successfully, otherwise throw
-	 * IllegalArgumentException
+	 * @param request the login request
+	 * @return the login information if the login is successful, empty otherwise
+	 * @throws IllegalArgumentException if the login request is invalid
 	 */
-	User login(AuthenticationRequest request) throws IllegalArgumentException;
+	Optional<LoginInformation> login(AuthenticationRequest request) throws IllegalArgumentException;
 
 	/**
-	 * Register a new user with the provided registration details.
+	 * Registers a new user using the given request.
 	 *
-	 * @param request the registration request containing user details
-	 * @return the registered user entity
-	 * @throws IllegalArgumentException if the registration details are invalid
+	 * @param request the registration request
+	 * @return the new user if the registration is successful, empty otherwise
+	 * @throws IllegalArgumentException if the registration request is invalid
 	 */
-	User register(RegistrationRequest request) throws IllegalArgumentException;
+	Optional<User> register(RegistrationRequest request) throws IllegalArgumentException;
+
+	Optional<JsonWebToken> getToken(SecurityIdentity securityIdentity) throws ExpiredTokenException, InvalidTokenException;
 }
