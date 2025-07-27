@@ -1,16 +1,16 @@
 CREATE TABLE job_tags
 (
-    id               INT PRIMARY KEY AUTO_INCREMENT NOT NULL AUTO_INCREMENT,
-    job_id           INT                            NOT NULL,
-    name             VARCHAR(64) UNIQUE             NOT NULL,
+    id               BIGINT PRIMARY KEY AUTO_INCREMENT NOT NULL AUTO_INCREMENT,
+    job_id           BIGINT                               NOT NULL,
+    name             VARCHAR(64) UNIQUE                NOT NULL,
     created_at       TIMESTAMP DEFAULT now(),
     last_modified_at TIMESTAMP DEFAULT now()
 );
 
 CREATE TABLE companies
 (
-    id               INT PRIMARY KEY AUTO_INCREMENT NOT NULL AUTO_INCREMENT,
-    name             VARCHAR(128)                   NOT NULL,
+    id               BIGINT PRIMARY KEY AUTO_INCREMENT NOT NULL AUTO_INCREMENT,
+    name             VARCHAR(128)                      NOT NULL,
     industry         VARCHAR(255),
     website_url      VARCHAR(255),
     logo_url         VARCHAR(255),
@@ -20,8 +20,8 @@ CREATE TABLE companies
 
 CREATE TABLE jobs
 (
-    id               INT PRIMARY KEY AUTO_INCREMENT,
-    employer_id      INT                                  NOT NULL,
+    id               BIGINT PRIMARY KEY AUTO_INCREMENT,
+    employer_id      BIGINT                                  NOT NULL,
     title            VARCHAR(255)                         NOT NULL,
     description      TEXT,
     salary_start     INT,
@@ -35,29 +35,29 @@ CREATE TABLE jobs
 
 CREATE TABLE applications
 (
-    id           INT PRIMARY KEY AUTO_INCREMENT,
-    job_id       INT,
-    candidate_id INT,
-    resume_id    INT,
+    id           BIGINT PRIMARY KEY AUTO_INCREMENT,
+    job_id       BIGINT,
+    candidate_id BIGINT,
+    resume_id    BIGINT,
     applied_at   TIMESTAMP DEFAULT now(),
     status       ENUM ('PENDING', 'REVIEWED', 'HIRED', 'FAILED', 'OTHER')
 );
 
 CREATE TABLE user_skills
 (
-    id               INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    user_id          INT                            NOT NULL,
-    name             VARCHAR(128) UNIQUE            NOT NULL,
+    id               BIGINT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    user_id          BIGINT                               NOT NULL,
+    name             VARCHAR(128) UNIQUE               NOT NULL,
     created_at       TIMESTAMP DEFAULT now(),
     last_modified_at TIMESTAMP DEFAULT now()
 );
 
 CREATE TABLE resumes
 (
-    id               INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    user_id          INT                            NOT NULL,
-    name             VARCHAR(128) UNIQUE            NOT NULL,
-    downloadable_url VARCHAR(255)                   NOT NULL,
+    id               BIGINT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    user_id          BIGINT                               NOT NULL,
+    name             VARCHAR(128) UNIQUE               NOT NULL,
+    downloadable_url VARCHAR(255)                      NOT NULL,
     is_primary       BOOLEAN,
     created_at       TIMESTAMP DEFAULT now(),
     last_modified_at TIMESTAMP DEFAULT now()
@@ -65,26 +65,26 @@ CREATE TABLE resumes
 
 CREATE TABLE users
 (
-    id               INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    role             ENUM ('CANDIDATE', 'EMPLOYER') NOT NULL,
-    company_id       INT                                     DEFAULT null,
-    first_name       VARCHAR(64)                    NOT NULL,
+    id               BIGINT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    role             ENUM ('CANDIDATE', 'EMPLOYER')    NOT NULL,
+    company_id       BIGINT                                        DEFAULT null,
+    first_name       VARCHAR(64)                       NOT NULL,
     middle_name      VARCHAR(64),
-    last_name        VARCHAR(64)                    NOT NULL,
+    last_name        VARCHAR(64)                       NOT NULL,
     course           VARCHAR(128),
     graduation_year  CHAR(4),
-    email            VARCHAR(128) UNIQUE            NOT NULL,
-    password         CHAR(60)                       NOT NULL,
-    is_active        BOOLEAN                        NOT NULL DEFAULT true,
+    email            VARCHAR(128) UNIQUE               NOT NULL,
+    password         CHAR(60)                          NOT NULL,
+    is_active        BOOLEAN                           NOT NULL DEFAULT true,
     last_login       TIMESTAMP,
-    created_at       TIMESTAMP                               DEFAULT now(),
-    last_modified_at TIMESTAMP                               DEFAULT now()
+    created_at       TIMESTAMP                                  DEFAULT now(),
+    last_modified_at TIMESTAMP                                  DEFAULT now()
 );
 
 CREATE TABLE forgot_password_codes
 (
-    id               INT PRIMARY KEY AUTO_INCREMENT,
-    user_id          INT UNIQUE     NOT NULL,
+    id               BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id          BIGINT UNIQUE     NOT NULL,
     code             CHAR(6) UNIQUE NOT NULL,
     expires_at       TIMESTAMP      NOT NULL,
     used             BOOLEAN   DEFAULT false,
