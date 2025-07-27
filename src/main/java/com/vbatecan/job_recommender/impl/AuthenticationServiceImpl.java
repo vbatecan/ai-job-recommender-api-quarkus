@@ -67,7 +67,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public Optional<User> register(@Valid RegistrationRequest request) throws IllegalArgumentException {
+	@Transactional
+	public Optional<User> register(RegistrationRequest request) throws IllegalArgumentException {
 		if (request == null) {
 			throw new IllegalArgumentException("Registration request cannot be null");
 		}
