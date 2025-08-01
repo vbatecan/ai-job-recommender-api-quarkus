@@ -7,15 +7,12 @@ import com.vbatecan.job_recommender.model.entity.User;
 import com.vbatecan.job_recommender.model.input.AuthenticationRequest;
 import com.vbatecan.job_recommender.model.input.RegistrationRequest;
 import com.vbatecan.job_recommender.model.output.LoginInformation;
-import com.vbatecan.job_recommender.model.output.MessageResponse;
 import com.vbatecan.job_recommender.service.AuthenticationService;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.jwt.build.Jwt;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +66,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Override
 	@Transactional
 	public Optional<User> register(RegistrationRequest request) throws IllegalArgumentException {
-		if (request == null) {
+		if ( request == null ) {
 			throw new IllegalArgumentException("Registration request cannot be null");
 		}
 
@@ -94,7 +91,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 				return Optional.empty();
 			}
 
-			if (isTokenExpired(token)) {
+			if ( isTokenExpired(token) ) {
 				throw new ExpiredTokenException("Token already expired and must be discarded and refreshed");
 			}
 
@@ -102,6 +99,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		} catch ( ClassCastException e ) {
 			throw new InvalidTokenException("Token format is not valid.");
 		}
+	}
+
+	@Override
+	public User getUserFromToken(JsonWebToken token) throws IllegalArgumentException, InvalidTokenException {
+		if ( token == null ) {
+			throw new IllegalArgumentException("Token cannot be null");
+		}
+
+		Optional<User> userOptional = User.find("email", token.getSubject()).firstResultOptional();
+		if ( userOptional.isEmpty() ) {
+			throw new InvalidTokenException("User email is not found in a token. Please try again to login.");
+		}
+
+		return userOptional.get();
 	}
 
 	private boolean isTokenExpired(JsonWebToken token) {
