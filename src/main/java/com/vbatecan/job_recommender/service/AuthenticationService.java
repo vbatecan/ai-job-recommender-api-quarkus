@@ -32,4 +32,6 @@ public interface AuthenticationService {
 	Optional<User> register(RegistrationRequest request) throws IllegalArgumentException;
 
 	Optional<JsonWebToken> getToken(SecurityIdentity securityIdentity) throws ExpiredTokenException, InvalidTokenException;
+
+	User getUserFromToken(JsonWebToken token) throws IllegalArgumentException, InvalidTokenException;
 }
