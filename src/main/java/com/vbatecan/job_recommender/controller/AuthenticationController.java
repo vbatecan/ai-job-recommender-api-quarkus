@@ -2,6 +2,7 @@ package com.vbatecan.job_recommender.controller;
 
 import com.vbatecan.job_recommender.exception.ExpiredTokenException;
 import com.vbatecan.job_recommender.exception.InvalidTokenException;
+import com.vbatecan.job_recommender.mapping.UserMapper;
 import com.vbatecan.job_recommender.model.entity.User;
 import com.vbatecan.job_recommender.model.enumeration.UserRole;
 import com.vbatecan.job_recommender.model.input.AuthenticationRequest;
@@ -10,6 +11,7 @@ import com.vbatecan.job_recommender.model.output.AuthCheckResponse;
 import com.vbatecan.job_recommender.model.output.LoginInformation;
 import com.vbatecan.job_recommender.model.output.MessageResponse;
 import com.vbatecan.job_recommender.service.AuthenticationService;
+import io.quarkus.security.Authenticated;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -24,6 +26,7 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.logging.Logger;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Optional;
 
@@ -57,10 +60,18 @@ public class AuthenticationController {
 
 		NewCookie cookie = new NewCookie.Builder("token")
 			.httpOnly(true)
-			.domain("http://localhost:8080")
-			.secure(true)
-		  	.value(loginInformation.token())
-			.maxAge(3600)
+			.path("/")
+			.secure(false)
+			.version(1)
+			.value(loginInformation.token())
+			.maxAge(
+				60 * 60 * 24 * 7
+			)
+			.expiry(
+				Date.from(
+					Instant.now().plus(1, ChronoUnit.DAYS)
+				)
+			)
 			.build();
 
 		return Response.ok(loginInformation).cookie(cookie).build();
@@ -79,6 +90,7 @@ public class AuthenticationController {
 	}
 
 	@Path("/is_authenticated")
+	@Authenticated
 	@GET
 	public Response isAuthenticated() {
 		try {
@@ -108,16 +120,29 @@ public class AuthenticationController {
 		}
 	}
 
+
+	@GET
+	@Path("/me")
+	@Authenticated
+	public Response me() {
+		try {
+			JsonWebToken token = ( JsonWebToken ) securityIdentity.getPrincipal();
+			User user = authenticationService.getUserFromToken(token);
+
+			return Response.ok()
+				.entity(UserMapper.INSTANCE.toDto(user))
+				.build();
+		} catch ( ClassCastException e ) {
+			log.error("Error while checking authentication", e);
+			return Response.status(Response.Status.UNAUTHORIZED)
+				.entity(new AuthCheckResponse(false, 0L, UserRole.GUEST))
+				.build();
+		}
+	}
+
 	@GET
 	@Path("/logout")
 	public Response logout() {
-		NewCookie cookie = new NewCookie.Builder("token")
-			.value("")
-			.maxAge(0)
-			.httpOnly(true)
-			.secure(true)
-			.expiry(Date.from(Instant.now()))
-			.build();
-		return Response.ok().cookie(cookie).build();
+		return Response.ok().cookie(null).build();
 	}
 }
