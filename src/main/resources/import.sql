@@ -1,7 +1,7 @@
 CREATE TABLE job_tags
 (
     id               BIGINT PRIMARY KEY AUTO_INCREMENT NOT NULL AUTO_INCREMENT,
-    job_id           BIGINT                               NOT NULL,
+    job_id           BIGINT                            NOT NULL,
     name             VARCHAR(64) UNIQUE                NOT NULL,
     created_at       TIMESTAMP DEFAULT now(),
     last_modified_at TIMESTAMP DEFAULT now()
@@ -21,7 +21,7 @@ CREATE TABLE companies
 CREATE TABLE jobs
 (
     id               BIGINT PRIMARY KEY AUTO_INCREMENT,
-    employer_id      BIGINT                                  NOT NULL,
+    employer_id      BIGINT                               NOT NULL,
     title            VARCHAR(255)                         NOT NULL,
     description      TEXT,
     salary_start     INT,
@@ -31,6 +31,31 @@ CREATE TABLE jobs
     expires_at       TIMESTAMP,
     created_at       TIMESTAMP DEFAULT now(),
     last_modified_at TIMESTAMP DEFAULT now()
+);
+
+CREATE TABLE job_skills_desired
+(
+    id            BIGINT PRIMARY KEY AUTO_INCREMENT NOT NULL AUTO_INCREMENT,
+    job_id        BIGINT                            NOT NULL,
+    user_skill_id BIGINT                            NOT NULL,
+    FOREIGN KEY (job_id) REFERENCES jobs (id),
+    FOREIGN KEY (user_skill_id) REFERENCES user_skills (id)
+);
+
+CREATE TABLE job_requirements
+(
+    id     BIGINT PRIMARY KEY AUTO_INCREMENT NOT NULL AUTO_INCREMENT,
+    job_id BIGINT                            NOT NULL,
+    name   VARCHAR(255)                      NOT NULL,
+    FOREIGN KEY (job_id) REFERENCES jobs (id)
+);
+
+CREATE TABLE job_benefits
+(
+    id     BIGINT PRIMARY KEY AUTO_INCREMENT NOT NULL AUTO_INCREMENT,
+    job_id BIGINT                            NOT NULL,
+    name   VARCHAR(255)                      NOT NULL,
+    FOREIGN KEY (job_id) REFERENCES jobs (id)
 );
 
 CREATE TABLE applications
@@ -46,7 +71,7 @@ CREATE TABLE applications
 CREATE TABLE user_skills
 (
     id               BIGINT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    user_id          BIGINT                               NOT NULL,
+    user_id          BIGINT                            NOT NULL,
     name             VARCHAR(128) UNIQUE               NOT NULL,
     created_at       TIMESTAMP DEFAULT now(),
     last_modified_at TIMESTAMP DEFAULT now()
@@ -55,7 +80,7 @@ CREATE TABLE user_skills
 CREATE TABLE resumes
 (
     id               BIGINT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    user_id          BIGINT                               NOT NULL,
+    user_id          BIGINT                            NOT NULL,
     name             VARCHAR(128) UNIQUE               NOT NULL,
     downloadable_url VARCHAR(255)                      NOT NULL,
     is_primary       BOOLEAN,
@@ -67,7 +92,7 @@ CREATE TABLE users
 (
     id               BIGINT PRIMARY KEY AUTO_INCREMENT NOT NULL,
     role             ENUM ('CANDIDATE', 'EMPLOYER')    NOT NULL,
-    company_id       BIGINT                                        DEFAULT null,
+    company_id       BIGINT                                     DEFAULT null,
     first_name       VARCHAR(64)                       NOT NULL,
     middle_name      VARCHAR(64),
     last_name        VARCHAR(64)                       NOT NULL,
@@ -84,7 +109,7 @@ CREATE TABLE users
 CREATE TABLE forgot_password_codes
 (
     id               BIGINT PRIMARY KEY AUTO_INCREMENT,
-    user_id          BIGINT UNIQUE     NOT NULL,
+    user_id          BIGINT UNIQUE  NOT NULL,
     code             CHAR(6) UNIQUE NOT NULL,
     expires_at       TIMESTAMP      NOT NULL,
     used             BOOLEAN   DEFAULT false,
