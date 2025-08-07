@@ -56,6 +56,18 @@ public class Job extends PanacheEntityBase {
 	@OneToMany(mappedBy = "job")
 	private Set<JobTag> jobTags = new LinkedHashSet<>();
 
+	@OneToMany
+	@JoinColumn(name = "job_id")
+	private Set<JobBenefit> jobBenefits = new LinkedHashSet<>();
+
+	@OneToMany
+	@JoinColumn(name = "job_id")
+	private Set<JobRequirement> jobRequirements = new LinkedHashSet<>();
+
+	@OneToMany
+	@JoinColumn(name = "job_id")
+	private Set<JobSkillsDesired> jobSkills = new LinkedHashSet<>();
+
 	@ColumnDefault("CURRENT_TIMESTAMP")
 	@Column(name = "created_at")
 	private Instant createdAt;
@@ -137,6 +149,33 @@ public class Job extends PanacheEntityBase {
 
 	public void setExpiresAt(Instant expiresAt) {
 		this.expiresAt = expiresAt;
+	}
+
+	public Set<JobBenefit> getJobBenefits() {
+		return jobBenefits;
+	}
+
+	public Job setJobBenefits(Set<JobBenefit> jobBenefits) {
+		this.jobBenefits = jobBenefits;
+		return this;
+	}
+
+	public Set<JobRequirement> getJobRequirements() {
+		return jobRequirements;
+	}
+
+	public Job setJobRequirements(Set<JobRequirement> jobRequirements) {
+		this.jobRequirements = jobRequirements;
+		return this;
+	}
+
+	public Set<JobSkillsDesired> getJobSkills() {
+		return jobSkills;
+	}
+
+	public Job setJobSkills(Set<JobSkillsDesired> jobSkills) {
+		this.jobSkills = jobSkills;
+		return this;
 	}
 
 	public Instant getCreatedAt() {

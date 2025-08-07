@@ -120,7 +120,7 @@ public class User extends PanacheEntityBase {
 		return userSkills;
 	}
 
-	public User setUserSkills(@NotNull Set<UserSkill> userSkills) {
+	public User setUserSkills(Set<UserSkill> userSkills) {
 		this.userSkills = userSkills;
 		return this;
 	}
