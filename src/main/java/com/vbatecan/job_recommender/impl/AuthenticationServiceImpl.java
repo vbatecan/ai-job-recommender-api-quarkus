@@ -3,8 +3,10 @@ package com.vbatecan.job_recommender.impl;
 import com.vbatecan.job_recommender.exception.ExpiredTokenException;
 import com.vbatecan.job_recommender.exception.InvalidTokenException;
 import com.vbatecan.job_recommender.mapping.UserMapper;
+import com.vbatecan.job_recommender.model.entity.ForgotPasswordCode;
 import com.vbatecan.job_recommender.model.entity.User;
 import com.vbatecan.job_recommender.model.input.AuthenticationRequest;
+import com.vbatecan.job_recommender.model.input.ForgotPasswordRequest;
 import com.vbatecan.job_recommender.model.input.RegistrationRequest;
 import com.vbatecan.job_recommender.model.output.LoginInformation;
 import com.vbatecan.job_recommender.service.AuthenticationService;
@@ -12,6 +14,7 @@ import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.jwt.build.Jwt;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.slf4j.Logger;
@@ -23,6 +26,9 @@ import java.util.Optional;
 
 @ApplicationScoped
 public class AuthenticationServiceImpl implements AuthenticationService {
+
+	@Inject
+	UserMapper userMapper;
 
 	private final Logger log = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
 
@@ -57,7 +63,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			.sign();
 
 		return Optional.of(new LoginInformation(
-			UserMapper.INSTANCE.toDto(user),
+			userMapper.toDto(user),
 			token,
 			user.getRole()
 		));
@@ -77,7 +83,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		}
 
 		User user = new User();
-		UserMapper.INSTANCE.partialUpdate(request, user);
+		userMapper.partialUpdate(request, user);
 		user.setPassword(BcryptUtil.bcryptHash(request.password()));
 		user.persist();
 		return Optional.of(user);
@@ -113,6 +119,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		}
 
 		return userOptional.get();
+	}
+
+	@Override
+	public boolean confirmForgotPassword(String code) {
+		return false;
+	}
+
+	@Override
+	public Optional<ForgotPasswordCode> saveForgotPasswordRequest(ForgotPasswordRequest request) {
+		return Optional.empty();
 	}
 
 	private boolean isTokenExpired(JsonWebToken token) {
