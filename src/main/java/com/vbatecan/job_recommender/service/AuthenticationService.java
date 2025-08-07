@@ -2,8 +2,10 @@ package com.vbatecan.job_recommender.service;
 
 import com.vbatecan.job_recommender.exception.ExpiredTokenException;
 import com.vbatecan.job_recommender.exception.InvalidTokenException;
+import com.vbatecan.job_recommender.model.entity.ForgotPasswordCode;
 import com.vbatecan.job_recommender.model.entity.User;
 import com.vbatecan.job_recommender.model.input.AuthenticationRequest;
+import com.vbatecan.job_recommender.model.input.ForgotPasswordRequest;
 import com.vbatecan.job_recommender.model.input.RegistrationRequest;
 import com.vbatecan.job_recommender.model.output.LoginInformation;
 import io.quarkus.security.identity.SecurityIdentity;
@@ -30,6 +32,10 @@ public interface AuthenticationService {
 	 * @throws IllegalArgumentException if the registration request is invalid
 	 */
 	Optional<User> register(RegistrationRequest request) throws IllegalArgumentException;
+
+	boolean confirmForgotPassword(String code);
+
+	Optional<ForgotPasswordCode> saveForgotPasswordRequest(ForgotPasswordRequest request);
 
 	Optional<JsonWebToken> getToken(SecurityIdentity securityIdentity) throws ExpiredTokenException, InvalidTokenException;
 
