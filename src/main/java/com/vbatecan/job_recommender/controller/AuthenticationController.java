@@ -6,25 +6,29 @@ import com.vbatecan.job_recommender.mapping.UserMapper;
 import com.vbatecan.job_recommender.model.entity.User;
 import com.vbatecan.job_recommender.model.enumeration.UserRole;
 import com.vbatecan.job_recommender.model.input.AuthenticationRequest;
+import com.vbatecan.job_recommender.model.input.ForgotPasswordRequest;
+import com.vbatecan.job_recommender.model.input.MailRequest;
 import com.vbatecan.job_recommender.model.input.RegistrationRequest;
 import com.vbatecan.job_recommender.model.output.AuthCheckResponse;
 import com.vbatecan.job_recommender.model.output.LoginInformation;
 import com.vbatecan.job_recommender.model.output.MessageResponse;
 import com.vbatecan.job_recommender.service.AuthenticationService;
+import com.vbatecan.job_recommender.service.MailerService;
+import com.vbatecan.job_recommender.service.TemplateService;
 import io.quarkus.security.Authenticated;
 import io.quarkus.security.identity.SecurityIdentity;
+import jakarta.annotation.security.PermitAll;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
+import jakarta.validation.constraints.Size;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.logging.Logger;
 
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -34,14 +38,12 @@ import java.util.Optional;
 @Path("/api/v1/auth")
 public class AuthenticationController {
 
-	@Inject
-	AuthenticationService authenticationService;
-
-	@Inject
-	Logger log;
-
-	@Inject
-	SecurityIdentity securityIdentity;
+	@Inject UserMapper userMapper;
+	@Inject AuthenticationService authenticationService;
+	@Inject MailerService mailerService;
+	@Inject TemplateService templateService;
+	@Inject Logger log;
+	@Inject SecurityIdentity securityIdentity;
 
 	@POST
 	@Path("/login")
@@ -130,7 +132,7 @@ public class AuthenticationController {
 			User user = authenticationService.getUserFromToken(token);
 
 			return Response.ok()
-				.entity(UserMapper.INSTANCE.toDto(user))
+				.entity(userMapper.toDto(user))
 				.build();
 		} catch ( ClassCastException e ) {
 			log.error("Error while checking authentication", e);
@@ -142,7 +144,61 @@ public class AuthenticationController {
 
 	@GET
 	@Path("/logout")
+	@PermitAll
 	public Response logout() {
-		return Response.ok().cookie(null).build();
+		NewCookie newCookie = new NewCookie.Builder("token")
+			.maxAge(0)
+			.build();
+
+		return Response.ok().cookie(newCookie).build();
+	}
+
+	@POST
+	@Path("/forgot-password/request")
+	@PermitAll
+	public Response forgotPasswordRequest(@Valid ForgotPasswordRequest request) {
+		SecureRandom random = new SecureRandom();
+		// Generate 6 alphanumeric code
+		String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+		StringBuilder code = new StringBuilder();
+		for ( int i = 0; i < 6; i++ ) {
+			int randomIndex = random.nextInt(chars.length());
+			code.append(chars.charAt(randomIndex));
+		}
+		String randomCode = code.toString();
+		String forgotPasswordTemplate = templateService.loadTemplate("forgot-password.html");
+		forgotPasswordTemplate = forgotPasswordTemplate.replace("%CODE%", randomCode);
+
+		MailRequest mailRequest = new MailRequest(
+			request.email(),
+			"Forgot Password Request",
+			forgotPasswordTemplate
+		);
+
+		mailerService.sendEmail(mailRequest);
+		return Response.ok(new MessageResponse(
+			"If the email is correct, the code will be sent. Please check the spam and refresh your inbox. If it still doesn't work, please try again later.",
+			true
+		)).build();
+	}
+
+	@POST
+	@Path("/forgot-password/{code}")
+	@PermitAll
+	public Response forgotPasswordSubmit(@PathParam("code") @Valid @Size(min = 6, max = 6, message = "Code should be 6 characters.") String code) {
+		return Response.ok().build();
+	}
+
+	@GET
+	@Path("/mail-test")
+	@PermitAll
+	public Response mailTest() {
+		mailerService.sendEmail(new MailRequest(
+			"vbatecan@gmail.com",
+			"Test",
+			"Test"
+		));
+
+		return Response.ok().build();
 	}
 }
