@@ -1,4 +1,4 @@
-# ai-job-recommender
+# AI Job Recommender
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
