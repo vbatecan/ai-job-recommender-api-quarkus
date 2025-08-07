@@ -14,7 +14,10 @@ import java.util.Set;
  */
 public record UserDTO(
 	Long id,
-	@NotNull String role,
+
+	@NotNull
+	String role,
+
 	@Null
 	CompanyDTO company,
 
@@ -25,6 +28,7 @@ public record UserDTO(
 	@Size(max = 64)
 	String firstName,
 
+	@Null
 	@Size(max = 64)
 	String middleName,
 
