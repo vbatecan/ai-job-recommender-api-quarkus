@@ -4,7 +4,7 @@ import com.vbatecan.job_recommender.model.dto.ResumeDTO;
 import com.vbatecan.job_recommender.model.entity.Resume;
 import org.mapstruct.*;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.CDI)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.JAKARTA_CDI)
 public interface ResumeMapper {
 	Resume toEntity(ResumeDTO resumeDTO);
 

@@ -4,7 +4,7 @@ import com.vbatecan.job_recommender.model.dto.UserSkillDTO;
 import com.vbatecan.job_recommender.model.entity.UserSkill;
 import org.mapstruct.*;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.CDI)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.JAKARTA_CDI)
 public interface UserSkillMapper {
 	UserSkill toEntity(UserSkillDTO userSkillDTO);
 
